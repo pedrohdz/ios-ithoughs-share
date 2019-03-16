@@ -8,6 +8,8 @@ import logging as log
 import requests
 from bs4 import BeautifulSoup
 
+from mind_maps import MindMaps
+
 
 class StateHandler():
     def __init__(self):
@@ -73,10 +75,18 @@ class Canceler(StateHandler): pass  # NOQA
 class StateData():
     # pylint: disable=too-few-public-methods
     def __init__(self):
+        self.initializer = None
         self.url_editor = None
         self.note_editor = None
         self.map_picker = None
         self.ithoughts_dispatcher = None
+
+
+class Initializer(StateHandler):
+    def handle(self, state_data, callback):
+        super().handle(state_data, callback)
+        state_data.initializer = {'mind_maps_file': 'mind_maps.json'}
+        callback('FORWARD')
 
 
 class UrlEditor(UiPanelStateHandler):
@@ -124,13 +134,109 @@ class NoteEditor(UiPanelStateHandler):
             'body': self.view['body'].text}
 
 
-class MapPicker(StateHandler):
-    # pylint: disable=too-few-public-methods
+class MapPicker(UiPanelStateHandler):
+    def __init__(self, view=None, list_data_source=None, mind_maps=None,
+                 form_dialog=None):
+        # pylint: disable=import-error
+        if not view:
+            import ui
+            view = ui.load_view('map_picker')
+        if not list_data_source:
+            import ui
+            list_data_source = ui.ListDataSource(list())
+        if not form_dialog:
+            import dialogs
+            form_dialog = dialogs.form_dialog
+        try:
+            import ui
+            capitalization = ui.AUTOCAPITALIZE_WORDS
+        except ModuleNotFoundError:
+            capitalization = None
+        super().__init__(view)
+        self.list_data_source = list_data_source
+        self.mind_maps = mind_maps
+        self.form_dialog = form_dialog
+        self.capitalization = capitalization
+
     def handle(self, state_data, callback):
         super().handle(state_data, callback)
-        state_data.map_picker = {
-            'map_path': '/test/test'}
-        callback('FORWARD')
+        # Setup actions
+        self.list_data_source.action = self.select
+        self.list_data_source.delete_enabled = False
+        self.view['map_list_table_view'].data_source = self.list_data_source
+        self.view['map_list_table_view'].delegate = self.list_data_source
+        self.view['ok'].enabled = False
+        self.view['add'].action = self.add_callback(state_data, callback)
+
+        # Populate list
+        if not self.mind_maps:
+            mind_maps_file = state_data.initializer['mind_maps_file']
+            self.mind_maps = MindMaps.loadf(mind_maps_file, create=True)
+        self.list_data_source.items = self.mind_maps
+        self.view.present('sheet')
+
+    def handle_ok(self, sender, state_data):
+        index = self.list_data_source.selected_row
+        map_path = self.list_data_source.items[index]
+        self.log.info('Item selected: %s', map_path)
+        state_data.map_picker = {'map_path': map_path}
+
+    def add_callback(self, _, callback):
+        # pylint: disable=invalid-name
+        def function(sender):
+            # pylint: disable=unused-argument
+            self.log.info('Go to add mind map')
+            self._view.close()
+            self._view.wait_modal()
+            callback('ADD_MIND_MAP')
+        return function
+
+    def select(self, sender):
+        self.log.info('Picked = %s', sender.selected_row)
+        if sender.selected_row > -1:
+            self.view['ok'].enabled = True
+        else:
+            self.view['ok'].enabled = False
+
+
+class MapAdder(UiPanelStateHandler):
+    def __init__(self, view=None):
+        # pylint: disable=import-error
+        if not view:
+            import ui
+            view = ui.load_view('map_adder')
+        try:
+            import ui
+            capitalization = ui.AUTOCAPITALIZE_WORDS
+        except ModuleNotFoundError:
+            capitalization = None
+        super().__init__(view)
+        self.capitalization = capitalization
+
+    def handle(self, state_data, callback):
+        super().handle(state_data, callback)
+        self.view['new_path'].text = '/Notes/New Map Name'
+        self.view.present('sheet')
+
+    def handle_ok(self, sender, state_data):
+        map_path = self.view['new_path'].text
+        self.log.info('Creating mind map: %s', map_path)
+        self.add_to_mind_maps(state_data.initializer['mind_maps_file'],
+                              map_path)
+
+        url = 'https://github.com/pedrohdz/ios-ithoughs-share'
+        body = ('Inbox for notes created by [ios-ithoughs-share]({}).'
+                .format(url))
+        title = '# Mind Map Inbox'
+        ithoughs_url = build_ithoughts_url(map_path, title, url, body,
+                                           create=True)
+        dispatch(ithoughs_url)
+
+    def add_to_mind_maps(self, mind_maps_file, map_path):
+        self.log.info('Adding "%s" to "%s"', map_path, mind_maps_file)
+        mind_maps = MindMaps.loadf(mind_maps_file, create=True)
+        mind_maps.add(map_path)
+        mind_maps.dumpf()
 
 
 class IThoughtsDispatcher(StateHandler):
@@ -141,7 +247,8 @@ class IThoughtsDispatcher(StateHandler):
             map_path,
             state_data.note_editor['title'],
             state_data.note_editor['url'],
-            state_data.note_editor['body'])
+            state_data.note_editor['body'],
+            create=False)
         dispatch(ithoughs_url)
         callback('FORWARD')
 
@@ -150,6 +257,10 @@ class _StateMetaClass(type):
     @property
     def start(cls):
         return 'START'
+
+    @property
+    def initialize(cls):
+        return 'INITIALIZE'
 
     @property
     def edit_url(cls):
@@ -162,6 +273,10 @@ class _StateMetaClass(type):
     @property
     def pick_mind_map(cls):
         return 'MAP_PICKER'
+
+    @property
+    def add_mind_map(cls):
+        return 'MAP_ADDER'
 
     @property
     def create_ithoughs_note(cls):
@@ -184,13 +299,18 @@ class State(metaclass=_StateMetaClass):
 class StateDispatcher():
     state_map = {
         State.start: {
+            'FORWARD': State.initialize},
+        State.initialize: {
             'FORWARD': State.edit_url},
         State.edit_url: {
             'FORWARD': State.edit_note},
         State.edit_note: {
             'FORWARD': State.pick_mind_map},
         State.pick_mind_map: {
-            'FORWARD': State.create_ithoughs_note},
+            'FORWARD': State.create_ithoughs_note,
+            'ADD_MIND_MAP': State.add_mind_map},
+        State.add_mind_map: {
+            'FORWARD': State.end},
         State.create_ithoughs_note: {
             'FORWARD': State.end},
         State.cancel: {
@@ -199,9 +319,11 @@ class StateDispatcher():
 
     def __init__(self,
                  state_data=StateData(),
+                 initializer=Initializer(),
                  url_editor=None,
                  note_editor=None,
                  map_picker=MapPicker(),
+                 map_adder=MapAdder(),
                  ithoughts_dispatcher=IThoughtsDispatcher(),
                  finisher=Finisher(),
                  canceler=Canceler()):
@@ -217,8 +339,10 @@ class StateDispatcher():
 
         self._handlers = {
             State.edit_url: url_editor,
+            State.initialize: initializer,
             State.edit_note: note_editor,
             State.pick_mind_map: map_picker,
+            State.add_mind_map: map_adder,
             State.create_ithoughs_note: ithoughts_dispatcher,
             State.end: finisher,
             State.cancel: canceler}
@@ -262,8 +386,9 @@ def get_input_url():
         'http://omz-software.com/pythonista/docs/ios/dialogs.html')
 
 
-def build_ithoughts_url(mind_map_path, title, url, body):
-    base_url = 'ithoughts://x-callback-url/makeMap'
+def build_ithoughts_url(mind_map_path, title, url, body, create):
+    base_url = 'ithoughts://x-callback-url'
+    resource = 'makeMap' if create else 'amendMap'
     arguments = {
         'format': 'md',
         'link': url,
@@ -272,8 +397,11 @@ def build_ithoughts_url(mind_map_path, title, url, body):
         'style': 'Chalkboard',
         'text': title,
     }
-    return '{}?{}'.format(
+    if not create:
+        arguments['target'] = r'Mind\s+Map\s+Inbox'
+    return '{}/{}?{}'.format(
         base_url,
+        resource,
         parse.urlencode(arguments, quote_via=parse.quote))
 
 
@@ -318,7 +446,7 @@ class WebPageNote():
             if not text:
                 continue
             description += (
-                '\n\n' if description else ''
+                ('\n\n' if description else '')
                 + text)
             blocks_processed += 1
             if blocks_processed > 4:

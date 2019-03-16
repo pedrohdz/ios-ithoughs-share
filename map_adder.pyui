@@ -1,0 +1,90 @@
+[
+  {
+    "nodes" : [
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{6, 6}, {473, 32}}",
+        "class" : "Label",
+        "attributes" : {
+          "flex" : "WB",
+          "font_size" : 18,
+          "frame" : "{{165, 144}, {150, 32}}",
+          "uuid" : "F8D71D41-8A56-48F2-92FA-904C5C40142C",
+          "class" : "Label",
+          "alignment" : "left",
+          "text" : "New mind map path",
+          "name" : "title",
+          "font_name" : "<System-Bold>"
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{399, 87}, {80, 32}}",
+        "class" : "Button",
+        "attributes" : {
+          "flex" : "LT",
+          "frame" : "{{200, 144}, {80, 32}}",
+          "title" : "OK",
+          "uuid" : "6221E79F-E3E4-4928-9C7D-54451DCAAEDA",
+          "font_bold" : true,
+          "class" : "Button",
+          "name" : "ok",
+          "font_size" : 15
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{311, 87}, {80, 32}}",
+        "class" : "Button",
+        "attributes" : {
+          "flex" : "LT",
+          "frame" : "{{200, 144}, {80, 32}}",
+          "title" : "Cancal",
+          "uuid" : "52C1F72A-2216-470A-9D91-F010D76DEE72",
+          "class" : "Button",
+          "name" : "cancel",
+          "font_size" : 15
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{6, 46}, {473, 32}}",
+        "class" : "TextField",
+        "attributes" : {
+          "name" : "new_path",
+          "flex" : "WB",
+          "frame" : "{{140, 144}, {200, 32}}",
+          "spellchecking_type" : "default",
+          "class" : "TextField",
+          "uuid" : "07018348-E909-4D7C-BE95-D0E402407E3A",
+          "alignment" : "left",
+          "autocorrection_type" : "default",
+          "font_size" : 17,
+          "font_name" : "<System>"
+        },
+        "selected" : false
+      }
+    ],
+    "frame" : "{{0, 0}, {485, 130}}",
+    "class" : "View",
+    "attributes" : {
+      "enabled" : true,
+      "background_color" : "RGBA(1.000000,1.000000,1.000000,1.000000)",
+      "tint_color" : "RGBA(0.000000,0.478000,1.000000,1.000000)",
+      "border_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
+      "flex" : ""
+    },
+    "selected" : false
+  }
+]

@@ -1,34 +1,31 @@
 # pylint: disable=missing-docstring,redefined-outer-name
-import sys
-import os
 from unittest.mock import Mock
 
 import pytest
 
-sys.path.append(
-    os.path.realpath(
-        os.path.join(
-            os.path.dirname(__file__),
-            os.path.pardir)))
-
-# pylint: disable=wrong-import-position
 from ithoughts_notes import (
     Canceler,
     Finisher,
     IThoughtsDispatcher,
+    Initializer,
     MapPicker,
     NoteEditor,
     State,
     StateData,
     StateDispatcher,
     UrlEditor,
-)  # NOQA
-# pylint: enable=wrong-import-position
+)
 
 
 # -----------------------------------------------------------------------------
 # Global fixtures
 # -----------------------------------------------------------------------------
+@pytest.fixture
+def initializer():
+    mocked_item = Mock(Initializer)
+    return mocked_item
+
+
 @pytest.fixture
 def state_data():
     mocked_item = Mock(StateData)
@@ -84,8 +81,8 @@ def canceler():
 
 
 @pytest.fixture
-def state_dispatcher(state_data, url_editor, note_editor, map_picker,
-                     ithoughts_dispatcher, finisher, canceler):
+def state_dispatcher(state_data, initializer, url_editor, note_editor,
+                     map_picker, ithoughts_dispatcher, finisher, canceler):
     # pylint: disable=too-many-arguments,unused-argument
     return StateDispatcher(**locals())
 
@@ -102,8 +99,18 @@ def test_initial_state(state_dispatcher):
 # -----------------------------------------------------------------------------
 # 'FORWARD'
 # -----------------------------------------------------------------------------
-def test_forward_from_start(state_dispatcher, url_editor):
+def test_forward_from_start(state_dispatcher, initializer):
     assert state_dispatcher.current_state == State.start
+    initializer.handle.reset_mock(side_effect=True)
+    state_dispatcher.next_state('FORWARD')
+    assert state_dispatcher.current_state == State.initialize
+    assert not state_dispatcher.is_end
+    assert not state_dispatcher.is_canceled
+
+
+def test_forward_from_initialize(state_dispatcher, url_editor):
+    # pylint: disable=protected-access
+    state_dispatcher._current_state = State.initialize
     url_editor.handle.reset_mock(side_effect=True)
     state_dispatcher.next_state('FORWARD')
     assert state_dispatcher.current_state == State.edit_url

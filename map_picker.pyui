@@ -1,0 +1,110 @@
+[
+  {
+    "nodes" : [
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{6, 46}, {528, 448}}",
+        "class" : "TableView",
+        "attributes" : {
+          "uuid" : "A3783F00-D2D8-427C-84E5-789764038719",
+          "editing" : false,
+          "background_color" : "RGBA(1.0, 1.0, 1.0, 1.0)",
+          "frame" : "{{60, 140}, {200, 200}}",
+          "data_source_items" : "Row 1\nRow 2\nRow 3",
+          "data_source_number_of_lines" : 1,
+          "data_source_delete_enabled" : false,
+          "data_source_font_size" : 18,
+          "row_height" : 44,
+          "class" : "TableView",
+          "name" : "map_list_table_view",
+          "flex" : "WH"
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{454, 502}, {80, 32}}",
+        "class" : "Button",
+        "attributes" : {
+          "flex" : "LT",
+          "frame" : "{{120, 224}, {80, 32}}",
+          "title" : "OK",
+          "uuid" : "07AD3F39-6F9F-471C-B945-5E0F10337C7D",
+          "class" : "Button",
+          "font_bold" : true,
+          "name" : "ok",
+          "font_size" : 15
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{366, 502}, {80, 32}}",
+        "class" : "Button",
+        "attributes" : {
+          "flex" : "LT",
+          "frame" : "{{120, 224}, {80, 32}}",
+          "title" : "Cancel",
+          "uuid" : "35335922-B0EA-4815-8249-0E4FD0194B6F",
+          "class" : "Button",
+          "name" : "cancel",
+          "font_size" : 15
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{6, 502}, {37, 32}}",
+        "class" : "Button",
+        "attributes" : {
+          "flex" : "RT",
+          "font_size" : 15,
+          "frame" : "{{120, 224}, {80, 32}}",
+          "title" : "",
+          "uuid" : "FA8F29D4-AA9E-4920-9970-6A59A00BA452",
+          "class" : "Button",
+          "name" : "add",
+          "image_name" : "iob:ios7_plus_outline_32"
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{6, 6}, {528, 32}}",
+        "class" : "Label",
+        "attributes" : {
+          "flex" : "WB",
+          "name" : "title",
+          "frame" : "{{195, 254}, {150, 32}}",
+          "uuid" : "5FD44443-5E8C-4340-A52A-58E98BD6C60E",
+          "class" : "Label",
+          "alignment" : "left",
+          "text" : "Select iThoughts mind map",
+          "font_size" : 18,
+          "font_name" : "<System-Bold>"
+        },
+        "selected" : false
+      }
+    ],
+    "frame" : "{{0, 0}, {540, 540}}",
+    "class" : "View",
+    "attributes" : {
+      "enabled" : true,
+      "background_color" : "RGBA(1.000000,1.000000,1.000000,1.000000)",
+      "tint_color" : "RGBA(0.000000,0.478000,1.000000,1.000000)",
+      "border_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
+      "flex" : ""
+    },
+    "selected" : false
+  }
+]

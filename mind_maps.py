@@ -10,31 +10,46 @@ from datetime import (datetime, timezone)
 
 class MindMaps(collections.abc.MutableMapping):
     # pylint: disable=too-many-ancestors
-    def __init__(self, data):
+    def __init__(self, data=None, filepath=None):
         self._log = log.getLogger(type(self).__name__)
-        self._data = data
+        self._data = data if data else {}
+        self._filepath = filepath
 
     @classmethod
-    def load(cls, string, *args, **kwds):
-        if 'object_hook' in kwds:
-            raise TypeError('object_hook is not allowed')
-        return json.load(string, object_hook=_object_hook, *args, **kwds)
+    def loadf(cls, filepath, create=False):
+        try:
+            # pylint: disable=protected-access
+            with open(filepath, 'r') as handle:
+                maps = json.load(handle, object_hook=_object_hook)
+            maps._filepath = filepath
+            return maps
+        except FileNotFoundError as exception:
+            if create:
+                return MindMaps(filepath=filepath)
+            raise exception
 
     @classmethod
-    def loads(cls, string, *args, **kwds):
-        if 'object_hook' in kwds:
-            raise TypeError('object_hook is not allowed')
-        return json.loads(string, object_hook=_object_hook, *args, **kwds)
+    def loads(cls, string):
+        return json.loads(string, object_hook=_object_hook)
 
-    def dump(self, *args, **kwds):
-        if 'cls' in kwds:
-            raise TypeError('cls is not allowed')
-        return json.dump(self, cls=_MindMapsEncoder, *args, **kwds)
+    def _dump(self, handle):
+        return json.dump(self, handle, cls=_MindMapsEncoder, sort_keys=True,
+                         indent=2)
 
-    def dumps(self, *args, **kwds):
-        if 'cls' in kwds:
-            raise TypeError('cls is not allowed')
-        return json.dumps(self, cls=_MindMapsEncoder, *args, **kwds)
+    def dumpf(self, filepath=None):
+        filepath = filepath if filepath is not None else self.filepath
+        with open(filepath, 'w') as handle:
+            self._dump(handle)
+
+    def dumps(self):
+        return json.dumps(self, cls=_MindMapsEncoder, sort_keys=True, indent=2)
+
+    @property
+    def filepath(self):
+        return self._filepath
+
+    def add(self, key):
+        self[key] = MindMap.create()
 
     def __getitem__(self, key):
         return self._data[key]
@@ -50,7 +65,7 @@ class MindMaps(collections.abc.MutableMapping):
 
     def __setitem__(self, key, value):
         if key in self._data:
-            raise TypeError('Replacing and existing MindMap is not allowed')
+            raise TypeError('Replacing an existing MindMap is not allowed')
         if not isinstance(value, MindMap):
             raise TypeError('Value must be of type MindMap')
         self._data[key] = value
@@ -86,8 +101,8 @@ class MindMap(collections.abc.Mapping):
     @classmethod
     def decode(cls, created, modified):
         return MindMap(
-            datetime.fromisoformat(created),
-            datetime.fromisoformat(modified))
+            fromisoformat(created),
+            fromisoformat(modified))
 
     @property
     def created(self):
@@ -110,6 +125,15 @@ class MindMap(collections.abc.Mapping):
 
     def __len__(self):
         return len(self._data)
+
+
+def fromisoformat(string):
+    import re
+    string = re.sub(r'([+-])(\d{2}):(\d{2})$', r'\1\2\3', string)
+    try:
+        return datetime.strptime(string, '%Y-%m-%dT%H:%M:%S.%f%z')
+    except ValueError:
+        return datetime.strptime(string, '%Y-%m-%dT%H:%M:%S%z')
 
 
 def utcnow():

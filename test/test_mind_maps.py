@@ -1,23 +1,14 @@
 # pylint: disable=missing-docstring,redefined-outer-name
-import sys
 import os
 from unittest import mock
 from datetime import (datetime, timezone)
-
 import pytest
 
-sys.path.append(
-    os.path.realpath(
-        os.path.join(
-            os.path.dirname(__file__),
-            os.path.pardir)))
-
-# pylint: disable=wrong-import-position
 from mind_maps import (
     MindMap,
     MindMaps,
-)  # NOQA
-# pylint: enable=wrong-import-position
+    utcnow,
+)
 
 
 TZ = timezone.utc
@@ -63,65 +54,64 @@ def mind_maps_json(mind_maps_json_file):
 
 @pytest.fixture
 def mind_maps(mind_maps_json_file):
-    with open(mind_maps_json_file, 'r') as infile:
-        return MindMaps.load(infile)
+    return MindMaps.loadf(mind_maps_json_file)
 
 
 # -----------------------------------------------------------------------------
 # MindMaps
 # -----------------------------------------------------------------------------
-def test_mind_maps_load(mind_maps_json_file, fixed_created, fixed_modified,
-                        fixed_now):
-    with open(mind_maps_json_file, 'r') as infile:
-        sample = MindMaps.loads(infile.read())
+def test_mind_maps_constructor_empty():
+    sample = MindMaps()
+    assert not sample
+    assert sample.filepath is None
+
+
+def test_mind_maps_constructor_empty_with_filepath(tmpdir):
+    tmpfile = os.path.join(tmpdir, 'mind_maps+output.json')
+    sample = MindMaps(filepath=tmpfile)
+    assert not sample
+    assert sample.filepath == tmpfile
+
+
+def test_mind_maps_loadf(mind_maps_json_file, fixed_created, fixed_modified,
+                         fixed_now):
+    sample = MindMaps.loadf(mind_maps_json_file)
     validate_small_mind_maps(sample, fixed_created, fixed_modified, fixed_now)
+    assert sample.filepath == mind_maps_json_file
 
 
-def test_mind_maps_load_no_object_hook(mind_maps_json_file):
-    with open(mind_maps_json_file, 'r') as infile:
-        with pytest.raises(TypeError) as exception:
-            MindMaps.loads(infile.read(), object_hook=None)
-        assert 'object_hook is not allowed' in str(exception.value)
+def test_mind_maps_loadf_create(tmpdir):
+    tmpfile = os.path.join(tmpdir, 'mind_maps+output.json')
+    sample = MindMaps.loadf(tmpfile, create=True)
+    assert not sample
+    assert sample.filepath == tmpfile
+    assert not os.path.exists(tmpfile)
+
+
+def test_mind_maps_loadf_no_create(tmpdir):
+    tmpfile = os.path.join(tmpdir, 'mind_maps+output.json')
+    with pytest.raises(FileNotFoundError):
+        MindMaps.loadf(tmpfile)
 
 
 def test_mind_maps_loads(mind_maps_json, fixed_created, fixed_modified,
                          fixed_now):
     sample = MindMaps.loads(mind_maps_json)
     validate_small_mind_maps(sample, fixed_created, fixed_modified, fixed_now)
+    assert sample.filepath is None
 
 
-def test_mind_maps_loads_no_object_hook(mind_maps_json):
-    with pytest.raises(TypeError) as exception:
-        MindMaps.loads(mind_maps_json, object_hook=None)
-    assert 'object_hook is not allowed' in str(exception.value)
-
-
-def test_mind_maps_dump(mind_maps, mind_maps_json, tmpdir):
+def test_mind_maps_dumpf(mind_maps, mind_maps_json, tmpdir):
     tmpfile = os.path.join(tmpdir, 'mind_maps+output.json')
-    with open(tmpfile, 'w') as outfile:
-        mind_maps.dump(outfile, sort_keys=True, indent=2)
+    mind_maps.dumpf(filepath=tmpfile)
     with open(tmpfile, 'r') as infile:
         what_was_writter = infile.read()
     assert what_was_writter == mind_maps_json
 
 
-def test_mind_maps_dump_no_cls(mind_maps, tmpdir):
-    tmpfile = os.path.join(tmpdir, 'mind_maps+output.json')
-    with open(tmpfile, 'w') as outfile:
-        with pytest.raises(TypeError) as exception:
-            mind_maps.dump(outfile, sort_keys=True, indent=2, cls=None)
-    assert 'cls is not allowed' in str(exception.value)
-
-
 def test_mind_maps_dumps(mind_maps, mind_maps_json):
-    dumped_string = mind_maps.dumps(sort_keys=True, indent=2)
+    dumped_string = mind_maps.dumps()
     assert dumped_string == mind_maps_json
-
-
-def test_mind_maps_dumps_no_cls(mind_maps):
-    with pytest.raises(TypeError) as exception:
-        mind_maps.dumps(cls=None, sort_keys=True, indent=2)
-    assert 'cls is not allowed' in str(exception.value)
 
 
 def validate_small_mind_maps(sample, fixed_created, fixed_modified, fixed_now):
@@ -152,7 +142,7 @@ def test_mind_maps_set_add(mind_maps):
 def test_mind_maps_set_replace(mind_maps):
     with pytest.raises(TypeError) as exception:
         mind_maps['created/created'] = MindMap.create()
-    assert 'Replacing and existing' in str(exception.value)
+    assert 'Replacing an existing' in str(exception.value)
     assert len(mind_maps) == 4
 
 
@@ -161,6 +151,12 @@ def test_mind_maps_set_add_bad(mind_maps):
         mind_maps['something/new/here'] = {'test': 'here'}
     assert 'Value must be of type MindMap' in str(exception.value)
     assert len(mind_maps) == 4
+
+
+def test_mind_maps_add(mind_maps):
+    mind_maps.add('something/new/here')
+    assert len(mind_maps) == 5
+    assert isinstance(mind_maps['something/new/here'], MindMap)
 
 
 # -----------------------------------------------------------------------------
@@ -197,3 +193,12 @@ def test_mind_map_immutable(mind_map):
         del mind_map['created']
     with pytest.raises(TypeError):
         mind_map['foo_bar'] = 'ha ha ha'
+
+
+# -----------------------------------------------------------------------------
+# utcnow()
+# -----------------------------------------------------------------------------
+def test_utcnow():
+    now = datetime.now(timezone.utc)
+    delta = (now - utcnow()).total_seconds()
+    assert abs(delta) < 5

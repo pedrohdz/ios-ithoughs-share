@@ -238,3 +238,5 @@ tags
 # Generated using ignr.py - github.com/Antrikshy/ignr.py
 
 /.virtualenv/
+/tmp/
+/mind_maps.json

@@ -1,0 +1,91 @@
+[
+  {
+    "nodes" : [
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{6, 6}, {468, 32}}",
+        "class" : "Label",
+        "attributes" : {
+          "flex" : "WB",
+          "font_size" : 18,
+          "frame" : "{{165, 144}, {150, 32}}",
+          "uuid" : "F8D71D41-8A56-48F2-92FA-904C5C40142C",
+          "class" : "Label",
+          "alignment" : "left",
+          "text" : "Edir URL",
+          "name" : "label1",
+          "font_name" : "<System-Bold>"
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{394, 282}, {80, 32}}",
+        "class" : "Button",
+        "attributes" : {
+          "flex" : "LT",
+          "frame" : "{{200, 144}, {80, 32}}",
+          "title" : "OK",
+          "uuid" : "6221E79F-E3E4-4928-9C7D-54451DCAAEDA",
+          "font_bold" : true,
+          "class" : "Button",
+          "name" : "ok",
+          "font_size" : 15
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{306, 282}, {80, 32}}",
+        "class" : "Button",
+        "attributes" : {
+          "flex" : "LT",
+          "frame" : "{{200, 144}, {80, 32}}",
+          "title" : "Cancal",
+          "uuid" : "52C1F72A-2216-470A-9D91-F010D76DEE72",
+          "class" : "Button",
+          "name" : "cancel",
+          "font_size" : 15
+        },
+        "selected" : false
+      },
+      {
+        "nodes" : [
+
+        ],
+        "frame" : "{{6, 46}, {468, 228}}",
+        "class" : "TextView",
+        "attributes" : {
+          "flex" : "WH",
+          "font_size" : 17,
+          "editable" : true,
+          "frame" : "{{140, 60}, {200, 200}}",
+          "spellchecking_type" : "no",
+          "class" : "TextView",
+          "uuid" : "0DF32F30-ADBB-4DC0-98B4-E5C60F0E8E6A",
+          "alignment" : "left",
+          "autocorrection_type" : "no",
+          "name" : "url",
+          "font_name" : "<System>"
+        },
+        "selected" : true
+      }
+    ],
+    "frame" : "{{0, 0}, {480, 320}}",
+    "class" : "View",
+    "attributes" : {
+      "enabled" : true,
+      "background_color" : "RGBA(1.000000,1.000000,1.000000,1.000000)",
+      "tint_color" : "RGBA(0.000000,0.478000,1.000000,1.000000)",
+      "border_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
+      "flex" : ""
+    },
+    "selected" : false
+  }
+]
