@@ -45,7 +45,6 @@ setup(
         'Development Status :: 3 - Alpha',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
     ],
     keywords='aws lambda',
     packages=find_packages(exclude=['tests']),
