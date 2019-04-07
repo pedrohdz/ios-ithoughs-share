@@ -301,16 +301,16 @@ class StateDispatcher():
         State.start: {
             'FORWARD': State.initialize},
         State.initialize: {
-            'FORWARD': State.edit_url},
-        State.edit_url: {
-            'FORWARD': State.edit_note},
-        State.edit_note: {
             'FORWARD': State.pick_mind_map},
         State.pick_mind_map: {
-            'FORWARD': State.create_ithoughs_note,
+            'FORWARD': State.edit_url,
             'ADD_MIND_MAP': State.add_mind_map},
         State.add_mind_map: {
             'FORWARD': State.end},
+        State.edit_url: {
+            'FORWARD': State.edit_note},
+        State.edit_note: {
+            'FORWARD': State.create_ithoughs_note},
         State.create_ithoughs_note: {
             'FORWARD': State.end},
         State.cancel: {
