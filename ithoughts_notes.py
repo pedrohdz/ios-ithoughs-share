@@ -225,7 +225,11 @@ class MapAdder(UiPanelStateHandler):
                               map_path)
 
         url = 'https://github.com/pedrohdz/ios-ithoughs-share'
-        body = ('Inbox for notes created by [ios-ithoughs-share]({}).'
+        body = ('## Mind Map Inbox\n\n'
+                'WARNING - Do not modify this note\n\n'
+                'New notes are attached to this one so they are easier to '
+                'find and process.\n\n'
+                '_Inbox for notes created by [ios-ithoughs-share]({})_.'
                 .format(url))
         title = '# Mind Map Inbox'
         ithoughs_url = build_ithoughts_url(map_path, title, url, body,
@@ -380,10 +384,10 @@ class StateDispatcher():
 
 def get_input_url():
     # pylint: disable=import-error
-    # import appex
-    # return appex.get_url()
-    return (
-        'http://omz-software.com/pythonista/docs/ios/dialogs.html')
+    import appex
+    url = appex.get_url()
+    return (url if url else
+            'http://omz-software.com/pythonista/docs/ios/dialogs.html')
 
 
 def build_ithoughts_url(mind_map_path, title, url, body, create):
