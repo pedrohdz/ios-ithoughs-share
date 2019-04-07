@@ -4,11 +4,16 @@
 from urllib import parse
 import webbrowser
 import logging as log
+import os
 
 import requests
 from bs4 import BeautifulSoup
 
 from mind_maps import MindMaps
+
+
+DEFAULT_CONFIG_DIR = os.path.abspath(
+    os.path.expanduser('~/Documents/.ios-ithoughs-share'))
 
 
 class StateHandler():
@@ -85,10 +90,20 @@ class StateData():
 class Initializer(StateHandler):
     def handle(self, state_data, callback):
         super().handle(state_data, callback)
+        self.create_dir_if_missing(DEFAULT_CONFIG_DIR)
         state_data.initializer = {
-            'mind_maps_file': 'mind_maps.json',
+            'mind_maps_file': os.path.join(DEFAULT_CONFIG_DIR,
+                                           'mind_maps.json'),
             'input_url': get_input_url()}
         callback('FORWARD')
+
+    def create_dir_if_missing(self, directory):
+        try:
+            os.makedirs(directory)
+            self.log.info('Created configuration directory: %s', directory)
+        except FileExistsError:
+            self.log.info(
+                'Configuration directory already exists: %s', directory)
 
 
 class UrlEditor(UiPanelStateHandler):
