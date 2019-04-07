@@ -85,14 +85,16 @@ class StateData():
 class Initializer(StateHandler):
     def handle(self, state_data, callback):
         super().handle(state_data, callback)
-        state_data.initializer = {'mind_maps_file': 'mind_maps.json'}
+        state_data.initializer = {
+            'mind_maps_file': 'mind_maps.json',
+            'input_url': get_input_url()}
         callback('FORWARD')
 
 
 class UrlEditor(UiPanelStateHandler):
     def __init__(self, view=None):
         if not view:
-            # pylint: disable=import-error
+            # pylint: disable=import-error,no-member
             import ui
             view = ui.load_view('url_editor')
         super().__init__(view)
@@ -101,7 +103,7 @@ class UrlEditor(UiPanelStateHandler):
     def handle(self, state_data, callback):
         super().handle(state_data, callback)
         state_data.url_editor = None
-        self.view['url'].text = get_input_url()
+        self.view['url'].text = state_data.initializer['input_url']
         self.view.present('sheet')
 
     def handle_ok(self, sender, state_data):
@@ -112,7 +114,7 @@ class UrlEditor(UiPanelStateHandler):
 class NoteEditor(UiPanelStateHandler):
     def __init__(self, view=None):
         if not view:
-            # pylint: disable=import-error
+            # pylint: disable=import-error,no-member
             import ui
             view = ui.load_view('ithoughts_notes')
         super().__init__(view)
@@ -137,7 +139,7 @@ class NoteEditor(UiPanelStateHandler):
 class MapPicker(UiPanelStateHandler):
     def __init__(self, view=None, list_data_source=None, mind_maps=None,
                  form_dialog=None):
-        # pylint: disable=import-error
+        # pylint: disable=import-error,no-member
         if not view:
             import ui
             view = ui.load_view('map_picker')
@@ -201,7 +203,7 @@ class MapPicker(UiPanelStateHandler):
 
 class MapAdder(UiPanelStateHandler):
     def __init__(self, view=None):
-        # pylint: disable=import-error
+        # pylint: disable=import-error,no-member
         if not view:
             import ui
             view = ui.load_view('map_adder')
