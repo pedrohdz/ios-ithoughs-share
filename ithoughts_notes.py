@@ -339,24 +339,44 @@ class StateDispatcher():
     }
 
     def __init__(self,
-                 state_data=StateData(),
-                 initializer=Initializer(),
+                 state_data=None,
+                 initializer=None,
                  url_editor=None,
                  note_editor=None,
-                 map_picker=MapPicker(),
-                 map_adder=MapAdder(),
-                 ithoughts_dispatcher=IThoughtsDispatcher(),
-                 finisher=Finisher(),
-                 canceler=Canceler()):
+                 map_picker=None,
+                 map_adder=None,
+                 ithoughts_dispatcher=None,
+                 finisher=None,
+                 canceler=None):
         # pylint: disable=too-many-arguments
         self._log = log.getLogger(type(self).__name__)
 
-        # Deffering object creation to allow dependency injection.
+        if not state_data:
+            state_data = StateData()
+
+        if not initializer:
+            initializer = Initializer()
+
         if not url_editor:
             url_editor = UrlEditor()
 
         if not note_editor:
             note_editor = NoteEditor()
+
+        if not map_picker:
+            map_picker = MapPicker()
+
+        if not map_adder:
+            map_adder = MapAdder()
+
+        if not ithoughts_dispatcher:
+            ithoughts_dispatcher = IThoughtsDispatcher()
+
+        if not finisher:
+            finisher = Finisher()
+
+        if not canceler:
+            canceler = Canceler()
 
         self._handlers = {
             State.edit_url: url_editor,

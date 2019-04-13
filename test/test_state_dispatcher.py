@@ -8,6 +8,7 @@ from ithoughts_notes import (
     Finisher,
     IThoughtsDispatcher,
     Initializer,
+    MapAdder,
     MapPicker,
     NoteEditor,
     State,
@@ -57,6 +58,14 @@ def map_picker():
 
 
 @pytest.fixture
+def map_adder():
+    mocked_item = Mock(MapAdder)
+    mocked_item.handle.side_effect = Exception(
+        'Should not have been called: MapAdder')
+    return mocked_item
+
+
+@pytest.fixture
 def ithoughts_dispatcher():
     mocked_item = Mock(IThoughtsDispatcher)
     mocked_item.handle.side_effect = Exception(
@@ -82,7 +91,8 @@ def canceler():
 
 @pytest.fixture
 def state_dispatcher(state_data, initializer, url_editor, note_editor,
-                     map_picker, ithoughts_dispatcher, finisher, canceler):
+                     map_picker, map_adder, ithoughts_dispatcher, finisher,
+                     canceler):
     # pylint: disable=too-many-arguments,unused-argument
     return StateDispatcher(**locals())
 
@@ -108,12 +118,12 @@ def test_forward_from_start(state_dispatcher, initializer):
     assert not state_dispatcher.is_canceled
 
 
-def test_forward_from_initialize(state_dispatcher, url_editor):
+def test_forward_from_initialize(state_dispatcher, map_picker):
     # pylint: disable=protected-access
     state_dispatcher._current_state = State.initialize
-    url_editor.handle.reset_mock(side_effect=True)
+    map_picker.handle.reset_mock(side_effect=True)
     state_dispatcher.next_state('FORWARD')
-    assert state_dispatcher.current_state == State.edit_url
+    assert state_dispatcher.current_state == State.pick_mind_map
     assert not state_dispatcher.is_end
     assert not state_dispatcher.is_canceled
 
@@ -128,22 +138,32 @@ def test_forward_from_edit_url(state_dispatcher, note_editor):
     assert not state_dispatcher.is_canceled
 
 
-def test_forward_from_edit_note(state_dispatcher, map_picker):
+def test_forward_from_edit_note(state_dispatcher, ithoughts_dispatcher):
     # pylint: disable=protected-access
     state_dispatcher._current_state = State.edit_note
-    map_picker.handle.reset_mock(side_effect=True)
+    ithoughts_dispatcher.handle.reset_mock(side_effect=True)
     state_dispatcher.next_state('FORWARD')
-    assert state_dispatcher.current_state == State.pick_mind_map
+    assert state_dispatcher.current_state == State.create_ithoughs_note
     assert not state_dispatcher.is_end
     assert not state_dispatcher.is_canceled
 
 
-def test_forward_from_pick_mind_map(state_dispatcher, ithoughts_dispatcher):
+def test_forward_from_pick_mind_map(state_dispatcher, url_editor):
     # pylint: disable=protected-access
     state_dispatcher._current_state = State.pick_mind_map
-    ithoughts_dispatcher.handle.reset_mock(side_effect=True)
+    url_editor.handle.reset_mock(side_effect=True)
     state_dispatcher.next_state('FORWARD')
-    assert state_dispatcher.current_state == State.create_ithoughs_note
+    assert state_dispatcher.current_state == State.edit_url
+    assert not state_dispatcher.is_end
+    assert not state_dispatcher.is_canceled
+
+
+def test_add_from_pick_mind_map(state_dispatcher, map_adder):
+    # pylint: disable=protected-access
+    state_dispatcher._current_state = State.pick_mind_map
+    map_adder.handle.reset_mock(side_effect=True)
+    state_dispatcher.next_state('ADD_MIND_MAP')
+    assert state_dispatcher.current_state == State.add_mind_map
     assert not state_dispatcher.is_end
     assert not state_dispatcher.is_canceled
 
