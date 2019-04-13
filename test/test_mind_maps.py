@@ -4,7 +4,7 @@ from unittest import mock
 from datetime import (datetime, timezone)
 import pytest
 
-from mind_maps import (
+from ithoughtsnotes.mind_maps import (
     MindMap,
     MindMaps,
     utcnow,
@@ -172,7 +172,7 @@ def test_mind_map_happy_state(mind_map, fixed_created, fixed_modified):
     assert len(mind_map) == 2
 
 
-@mock.patch('mind_maps.utcnow')
+@mock.patch('ithoughtsnotes.mind_maps.utcnow')
 def test_mind_map_create(mock_utcnow, fixed_now):
     mock_utcnow.return_value = fixed_now
     value = MindMap.create()
@@ -180,7 +180,7 @@ def test_mind_map_create(mock_utcnow, fixed_now):
     assert value.modified == fixed_now
 
 
-@mock.patch('mind_maps.utcnow')
+@mock.patch('ithoughtsnotes.mind_maps.utcnow')
 def test_mind_map_touch(mock_utcnow, mind_map, fixed_created, fixed_now):
     mock_utcnow.return_value = fixed_now
     mind_map.touch()

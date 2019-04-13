@@ -3,7 +3,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from ithoughts_notes import (
+from ithoughtsnotes.ithoughts_notes import (
     Canceler,
     Finisher,
     IThoughtsDispatcher,

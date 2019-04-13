@@ -33,7 +33,7 @@ _CI_REQUIRE = [
 ]
 
 setup(
-    name='ithoughts-quick-notes',
+    name='ithoughts-notes',
     # version=version(),
     author='Pedro H.',
     author_email='todo@todo',
@@ -52,7 +52,10 @@ setup(
     setup_requires=[
         'pytest-runner',
     ],
-    install_requires=[],
+    install_requires=[
+        'beautifulsoup4>=4.7.1',
+        'requests>=2.21.0',
+    ],
     tests_require=_TEST_REQUIRE,
     extras_require={
         'ci': _CI_REQUIRE,

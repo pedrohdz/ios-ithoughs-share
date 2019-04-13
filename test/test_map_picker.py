@@ -3,7 +3,7 @@ import os
 # from unittest import mock
 # import pytest
 
-from ithoughts_notes import MapPicker
+from ithoughtsnotes.ithoughts_notes import MapPicker
 
 
 # -----------------------------------------------------------------------------

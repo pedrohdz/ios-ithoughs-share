@@ -9,7 +9,7 @@ import os
 import requests
 from bs4 import BeautifulSoup
 
-from mind_maps import MindMaps
+from ithoughtsnotes.mind_maps import MindMaps
 
 
 DEFAULT_CONFIG_DIR = os.path.abspath(
