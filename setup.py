@@ -33,7 +33,7 @@ _CI_REQUIRE = [
 ]
 
 setup(
-    name='ithoughts-notes',
+    name='ithoughts-share',
     # version=version(),
     author='Pedro H.',
     author_email='todo@todo',
