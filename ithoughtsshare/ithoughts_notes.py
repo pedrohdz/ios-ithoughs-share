@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # pylint: disable=missing-docstring
 
 from urllib import parse
@@ -494,13 +493,3 @@ class WebPageNote():
                 break
         return ('## {}\n\n{}\n\n_[quick link]({})_'
                 .format(self.raw_title, description, self.url))
-
-
-def main():
-    dispatcher = StateDispatcher()
-    dispatcher.next_state('FORWARD')
-
-
-if __name__ == "__main__":
-    log.basicConfig(level=log.DEBUG)
-    main()
